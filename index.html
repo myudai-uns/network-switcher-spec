@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>かんたんネット切替ツール｜要件定義書</title>
+<title>IPアドレス切替アプリ｜要件定義書 v2.0</title>
 <style>
   :root{
     --bg:#f4f5f7; --card:#ffffff; --ink:#1f2530; --sub:#5b6270;
     --line:#e2e5ea; --accent:#ea6a1e; --accent2:#2f8f4e; --warn:#b3261e;
-    --chip:#eef1f5;
+    --chip:#eef1f5; --blue:#2f6fb3;
   }
   *{box-sizing:border-box;}
   body{
@@ -60,26 +60,38 @@
     padding:14px 18px; border-radius:8px; margin:14px 0;
   }
   .callout.warn{border-left-color:var(--warn); background:#fdf1f0;}
+  .callout.blue{border-left-color:var(--blue); background:#eef4fb;}
   .callout strong{color:#1f2530;}
 
   code,.mono{font-family:"Consolas","SF Mono",monospace; background:var(--chip);
     padding:1px 7px; border-radius:5px; font-size:13.5px;}
+
+  .badge{display:inline-block; font-size:11px; font-weight:700; padding:2px 9px; border-radius:6px; vertical-align:middle;}
+  .badge.fix{background:#fdecdf; color:#b35a14;}
+  .badge.ok{background:#e4f3ea; color:#1f7a3d;}
+  .badge.tbd{background:#f0e7fa; color:#6b3fa0;}
+
+  .flow{display:flex; flex-wrap:wrap; align-items:stretch; gap:10px; margin:14px 0;}
+  .flow .step{
+    flex:1 1 150px; background:#f7f9fb; border:1px solid var(--line); border-radius:10px;
+    padding:14px; text-align:center; min-width:140px;
+  }
+  .flow .step b{display:block; font-size:13px; color:var(--accent); margin-bottom:6px;}
+  .flow .arrow{align-self:center; color:#aab1bc; font-weight:700;}
 
   .screen{
     background:#1f2530; color:#e6e9ee; border-radius:10px; padding:18px 20px;
     font-family:"Consolas",monospace; font-size:13px; line-height:1.85; white-space:pre; overflow-x:auto;
   }
 
-  /* confirmation sheet */
   .sheet th{background:#fff4ec;}
   .sheet input[type=text]{
     width:100%; border:none; border-bottom:1.5px solid #cdd2da; background:transparent;
     font-size:14px; padding:5px 2px; font-family:inherit; color:#1f2530;
   }
   .sheet input[type=text]:focus{outline:none; border-bottom-color:var(--accent);}
-  .sheet td.q{width:30%;}
-  .sheet td.cur{width:24%; color:#6b7280; font-size:13px;}
-  .sheet td.ans{width:46%; background:#fffdfa;}
+  .sheet td.q{width:34%;}
+  .sheet td.ans{width:66%; background:#fffdfa;}
   .print-row{margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;}
   .btn{
     border:none; background:var(--accent); color:#fff; font-weight:700; font-size:14px;
@@ -96,189 +108,174 @@
     .print-row,.no-print{display:none;}
     section{box-shadow:none; page-break-inside:avoid;}
   }
-  @media(max-width:560px){
-    .screen{font-size:11px;}
-    th,td{padding:7px 8px;}
-  }
+  @media(max-width:560px){ .screen{font-size:11px;} th,td{padding:7px 8px;} }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header class="hero">
-    <span class="tag">要件定義書</span>
-    <h1>かんたんネット切替ツール</h1>
-    <p>Windows 端末の IPv4 設定（固定IP ⇔ 自動取得）をボタン操作で切り替えるツール</p>
+    <span class="tag">要件定義書 v2.0</span>
+    <h1>IPアドレス切替アプリ</h1>
+    <p>Windows 11 端末の社内（DHCP）／社外（固定IP）をボタン操作で切り替えるツール</p>
     <div class="meta">
-      <span>版数：v1.0（ドラフト）</span>
-      <span>作成日：2026-06-22</span>
-      <span>対象OS：Windows 10 / 11</span>
-      <span>形態：単一exe ＋ 設定ファイル</span>
+      <span>版数：v2.0（2026-06-22 打合せ反映）</span>
+      <span>対象OS：Windows 11 Pro</span>
+      <span>納期：2026年7月末予定</span>
+      <span>導入台数：約20台（増加可能性）</span>
     </div>
   </header>
+
+  <section>
+    <h2>0. 本書の位置づけ</h2>
+    <p class="lead">2026-06-22 の打合せ議事録を反映した版です。前版(v1.0)からの主な変更点は以下のとおりです。</p>
+    <table>
+      <tr><th style="width:36%">変更点</th><th>内容</th></tr>
+      <tr><td>起動画面の方式</td><td>「番号入力方式」→ <strong>「社内／社外」2ボタン方式</strong>に変更</td></tr>
+      <tr><td>端末ごとの入力</td><td>末尾番号のみ → <strong>5項目すべてを入力フォームで設置</strong>に変更</td></tr>
+      <tr><td>操作順序</td><td>① 社内／社外を選ぶ → ② アダプタを選ぶ → 自動切替</td></tr>
+      <tr><td>確定事項</td><td>OS=Win11 Pro、有線LAN対応、納期=7月末、台数≈20台 を確定</td></tr>
+    </table>
+  </section>
 
   <!-- 1 背景・目的 -->
   <section>
     <h2>1. 背景・目的</h2>
-    <h3>1.1 背景（現状の課題）</h3>
-    <p class="lead">現場端末では、ネットワーク設定を Windows の「アダプターの設定 → インターネットプロトコル v4 → プロパティ」画面から<strong>手入力</strong>で切り替えている。</p>
+    <p class="lead">現場端末では、ネットワーク設定を Windows の設定画面から<strong>手入力</strong>で「社内（自動取得）」と「社外（固定IP）」に切り替えている。手順が長く打ち間違いが起きやすいため、<strong>ボタン操作で同一の設定を正確に切り替える</strong>ツールを導入する。</p>
+    <div class="callout">設定される項目・値は現状の手入力と同一。<strong>「結果は変えず、手順と事故だけ無くす」</strong>ことがゴール。</div>
+    <h3>非ゴール</h3>
     <ul>
-      <li>IPアドレス／サブネットマスク／デフォルトゲートウェイ／優先・代替DNS の固定値と自動取得（DHCP）を、場面に応じて切り替える必要がある</li>
-      <li>手順が長く（10ステップ以上）、毎回4つの数字を手打ちするため、<strong>打ち間違い・設定漏れの事故</strong>が起きやすい</li>
-      <li>端末ごとに固定IPの末尾が異なるため、作業が属人的になりやすい</li>
-    </ul>
-    <h3>1.2 目的</h3>
-    <p>上記の<strong>手入力作業をボタン操作に置き換える</strong>。設定される項目・値は現状の手入力と完全に同一とし、<strong>「結果は変えず、手順と事故だけ無くす」</strong>ことをゴールとする。</p>
-    <h3>1.3 非ゴール（やらないこと）</h3>
-    <ul>
-      <li>ネットワーク構成・IP体系そのものの変更（現状をそのまま移管するだけ）</li>
-      <li>IPv6設定、プロキシ設定、VPN設定</li>
+      <li>ネットワーク構成・IP体系そのものの変更</li>
+      <li>IPv6設定（<strong>IPv4のみ対応</strong>）、プロキシ／VPN設定</li>
       <li>サーバー連携・集中管理（各端末単体で完結）</li>
     </ul>
   </section>
 
   <!-- 2 対象・前提 -->
   <section>
-    <h2>2. 対象・前提</h2>
+    <h2>2. 対象・前提 <span class="badge ok">確定</span></h2>
     <table>
       <tr><th style="width:34%">項目</th><th>内容</th></tr>
-      <tr><td>対象OS</td><td>Windows 10 / 11</td></tr>
-      <tr><td>対象アダプタ</td><td>Wi-Fi（主）／有線LAN（可能なら）の両方。実行時に選択</td></tr>
+      <tr><td>対象OS</td><td>Windows 11 Pro</td></tr>
+      <tr><td>対象アダプタ</td><td>Wi-Fi ／ 有線LAN（両対応）</td></tr>
+      <tr><td>IP設定</td><td>IPv4 のみ対応（IPv6 対応不要）</td></tr>
       <tr><td>実行権限</td><td>管理者権限（起動時にUAC昇格を自動要求）</td></tr>
-      <tr><td>配布形態</td><td>単一exe（<code>NetworkSwitcher.exe</code>）＋設定ファイル <code>profiles.json</code></td></tr>
-      <tr><td>利用者</td><td>現場端末の操作者（ITに詳しくない人を想定）</td></tr>
-      <tr><td>技術方式</td><td>設定変更は Windows 標準コマンド <code>netsh</code> 経由（手入力と同一結果）</td></tr>
+      <tr><td>配布形態</td><td>単一exe ＋ 端末ごとの設定保存ファイル</td></tr>
+      <tr><td>導入台数</td><td>約20台（今後増加の可能性あり）</td></tr>
+      <tr><td>納期</td><td>2026年7月末予定</td></tr>
+      <tr><td>技術方式</td><td>Windows標準コマンド <code>netsh</code> 経由（手入力と同一結果）</td></tr>
     </table>
   </section>
 
-  <!-- 3 機能要件 -->
+  <!-- 3 画面構成・操作フロー -->
   <section>
-    <h2>3. 機能要件</h2>
+    <h2>3. 画面構成・操作フロー</h2>
+
+    <h3>① 起動画面（社内／社外の選択）</h3>
+    <div class="flow">
+      <div class="step"><b>① 起動画面</b>「社内」<br>「社外」を選択</div>
+      <div class="arrow">▶</div>
+      <div class="step"><b>② アダプタ選択</b>「Wi-Fi」<br>「有線LAN」を選択</div>
+      <div class="arrow">▶</div>
+      <div class="step"><b>③ 自動切替</b>選択内容で<br>ネットワーク設定を適用</div>
+    </div>
+
+    <table>
+      <tr><th style="width:24%">選択</th><th>切替内容</th></tr>
+      <tr><td><strong>社内</strong></td><td>DHCP（自動取得）に設定</td></tr>
+      <tr><td><strong>社外</strong></td><td>固定IP（端末ごとに保存した値）に設定</td></tr>
+    </table>
+
+    <h3>設定画面（端末ごとの固定IP値を入力）</h3>
+    <p>「社外（固定IP）」で使う値を端末ごとに入力・保存する画面を設ける。</p>
+<div class="screen">［ 設定（この端末の固定IP）］
+   IPアドレス        : [ 10.208.38.___    ]
+   サブネットマスク   : [ 255.255.255.0    ]
+   デフォルトゲートウェイ: [ 10.208.38.___   ]
+   優先DNSサーバー    : [ ______________   ]
+   代替DNSサーバー    : [ ______________   ]
+                                  [ 保存 ]
+
+  ※入力内容は自動保存。次回起動時も前回値を表示。</div>
+  </section>
+
+  <!-- 4 機能要件 -->
+  <section>
+    <h2>4. 機能要件</h2>
     <table>
       <tr><th>ID</th><th>機能</th><th>内容</th></tr>
-      <tr><td class="id">FR-1</td><td>アダプタ選択</td><td>物理アダプタ（Wi-Fi・有線）を一覧表示。接続中を上位表示。「更新」で再取得。</td></tr>
-      <tr><td class="id">FR-2</td><td>現在設定の表示</td><td>選択中アダプタの 取得方法／IP／マスク／GW／DNS を表示。切替後は自動再取得。</td></tr>
-      <tr><td class="id">FR-3</td><td><strong>固定IP切替<br>（番号入力方式）</strong></td>
-        <td>共通テンプレート <code>10.208.{セグメント}.{ホスト番号}</code> で固定IPを生成。
+      <tr><td class="id">FR-1</td><td>社内／社外の選択</td><td>起動画面に「社内」「社外」ボタンを配置。社内=DHCP、社外=固定IP。</td></tr>
+      <tr><td class="id">FR-2</td><td>アダプタ選択</td><td>「Wi-Fi」「有線LAN」を選択。選択後、自動で設定を切替。</td></tr>
+      <tr><td class="id">FR-3</td><td>社内切替（DHCP）</td><td>IPアドレス・DNS の両方を自動取得（DHCP）に戻す。</td></tr>
+      <tr><td class="id">FR-4</td><td>社外切替（固定IP）</td><td>保存済みの固定IP設定（5項目）を適用する。</td></tr>
+      <tr><td class="id">FR-5</td><td><strong>端末ごとの設定入力</strong></td>
+        <td>設定画面に以下5項目の入力フォームを設置：
           <ul>
-            <li>セグメント選択：<code>10.208.38.x</code> / <code>10.208.40.x</code></li>
-            <li>ホスト番号入力：末尾のみ入力（38系=<strong>1〜243</strong>／40系=<strong>1〜190</strong>）</li>
-            <li>範囲外・数字以外はエラーで適用不可</li>
-            <li>マスク・GW・優先/代替DNS はセグメントごとに自動付与</li>
-            <li>適用前にプレビュー表示</li>
+            <li>IPアドレス</li><li>サブネットマスク</li><li>デフォルトゲートウェイ</li>
+            <li>優先DNSサーバー</li><li>代替DNSサーバー</li>
           </ul></td></tr>
-      <tr><td class="id">FR-4</td><td><strong>端末ごとの<br>設定保持</strong></td>
-        <td>入力したセグメント・番号を端末内（<code>last_input.json</code>）に保存し、次回起動時に自動復元。<strong>端末ごとに一度入力すれば以後は入力不要</strong>。exeは全端末共通、端末差は保存ファイルで吸収。</td></tr>
-      <tr><td class="id">FR-5</td><td>自動取得(DHCP)切替</td><td>IPアドレス・DNS の両方を自動取得（DHCP）に戻す。</td></tr>
-      <tr><td class="id">FR-6</td><td>設定ファイル管理</td><td>セグメント定義・レンジ・マスク・GW・DNS を <code>profiles.json</code> で管理。再読込可。不在時はサンプル自動生成。記述エラーは日本語提示。</td></tr>
-      <tr><td class="id">FR-7</td><td>入力チェック</td><td>適用前に形式・範囲を検証。不正時は中止し原因を日本語表示。</td></tr>
+      <tr><td class="id">FR-6</td><td><strong>自動保存・前回値表示</strong></td><td>入力内容は自動保存し、次回起動時も前回値を表示する。</td></tr>
+      <tr><td class="id">FR-7</td><td>入力チェック</td><td>適用前にIPv4形式を検証。不正時は中止し原因を日本語表示。</td></tr>
+      <tr><td class="id">FR-8</td><td>現在設定の表示</td><td>選択中アダプタの現在の設定（取得方法・IP等）を表示（任意）。</td></tr>
     </table>
   </section>
 
-  <!-- 4 非機能要件 -->
+  <!-- 5 ネットワーク前提 -->
   <section>
-    <h2>4. 非機能要件</h2>
+    <h2>5. ネットワーク前提</h2>
     <table>
-      <tr><th style="width:22%">区分</th><th>要件</th></tr>
-      <tr><td>操作性</td><td>不慣れな人でも「選ぶ→押す」の2アクションで完了。日本語UI・大きめボタン。</td></tr>
-      <tr><td>正確性</td><td><code>netsh</code> 経由で設定。手入力と同一の結果を保証。</td></tr>
-      <tr><td>安全性</td><td>範囲外IPを物理的に入力不可とし、誤設定を防止。</td></tr>
-      <tr><td>応答性</td><td>取得・適用は別スレッドで実行しUIを固めない。</td></tr>
-      <tr><td>可搬性</td><td>単一exeで動作。Python等のインストール不要。</td></tr>
-      <tr><td>保守性</td><td>IP体系の変更は <code>profiles.json</code> 編集のみで対応（再ビルド不要）。</td></tr>
-      <tr><td>権限</td><td>管理者権限が無い場合は明確に案内。</td></tr>
+      <tr><th style="width:34%">項目</th><th>内容</th></tr>
+      <tr><td>対象セグメント</td><td><code>10.208.38.xxx</code> ／ <code>10.208.40.xxx</code>（利用状況に応じて割当）</td></tr>
+      <tr><td>DNS・ゲートウェイ等</td><td>共通 <span class="badge tbd">詳細値は後日メール共有予定</span></td></tr>
+      <tr><td>端末ごとに異なる値</td><td>IPアドレスのみ（マスク・GW・DNSは系統内で共通）</td></tr>
     </table>
-  </section>
-
-  <!-- 5 画面構成 -->
-  <section>
-    <h2>5. 画面構成（イメージ）</h2>
-<div class="screen">① 設定するネットワーク（Wi-Fi / 有線）   [ 選択 ▼ ] [ 更新 ]
-
-② 今の設定
-    取得方法 : 手動設定（固定IP）
-    IPアドレス : 10.208.38.15
-    サブネット : 255.255.255.0  ...
-
-③ 切り替え先を選ぶ
-    ○ 現場 固定IP（番号を入力）
-         セグメント   : [ 10.208.38.x ▼ ]
-         ホスト番号   : [   15   ]  （1〜243）
-    ○ 自動取得（DHCP）
-    ── プレビュー ───────────────
-       IPアドレス : 10.208.38.15
-       ゲートウェイ: 10.208.38.254  ...
-
-   [ この設定に切り替える ]   [ 自動取得（DHCP）に戻す ]
-   ▶ 結果メッセージ</div>
+    <div class="callout blue">
+      <strong>補足：</strong>マスク・ゲートウェイ・DNSは系統（38系/40系）内で共通のため、設定画面ではこれらを既定値としてあらかじめ表示し、<strong>実際に各端末で変えるのはIPアドレスのみ</strong>とする運用も可能（入力ミス低減）。本書では議事録どおり5項目すべてを入力可能とする。
+    </div>
   </section>
 
   <!-- 6 確認シート -->
   <section class="sheet">
-    <h2>6. 確認シート（現場で記入してください）</h2>
-    <p class="lead">本ツールを<strong>「現状の手入力運用」と完全に同一</strong>にするため、現状の実値が必要です。<br>
-    現場端末を1台開き、<span class="mono">設定 → ネットワーク → アダプターの設定変更 → Wi-Fiを右クリック → プロパティ → インターネットプロトコル v4 → プロパティ</span> の画面に表示されている値を、下表に記入してください。</p>
-
-    <div class="callout">
-      <strong>記入のコツ：</strong>固定IPが設定されている端末を見れば、マスク・ゲートウェイ・DNSが表示されています。その数字をそのまま転記すればOKです。
-    </div>
-
+    <h2>6. 確認シート（後日メール共有いただく項目）</h2>
+    <p class="lead">下記が確定すれば設計・実装を確定できます。<span class="badge tbd">後日メール</span> の項目を中心にご共有ください。</p>
     <table>
-      <tr><th class="id">#</th><th class="q">確認項目</th><th class="cur">現状（仮の値）</th><th class="ans">確定値（記入欄）</th></tr>
-      <tr><td class="id">Q1</td><td class="q">サブネットマスク</td><td class="cur">255.255.255.0</td><td class="ans"><input type="text" placeholder="例：255.255.255.0"></td></tr>
-      <tr><td class="id">Q2</td><td class="q">ゲートウェイ（38系）</td><td class="cur">10.208.38.254</td><td class="ans"><input type="text" placeholder="例：10.208.38.254"></td></tr>
-      <tr><td class="id">Q3</td><td class="q">ゲートウェイ（40系）</td><td class="cur">10.208.40.254</td><td class="ans"><input type="text" placeholder="例：10.208.40.254"></td></tr>
-      <tr><td class="id">Q4</td><td class="q">優先DNS（38系 / 40系）</td><td class="cur">GWと同じ</td><td class="ans"><input type="text" placeholder="38系：____ ／ 40系：____"></td></tr>
-      <tr><td class="id">Q5</td><td class="q">代替DNS（あれば）</td><td class="cur">なし</td><td class="ans"><input type="text" placeholder="なし／________"></td></tr>
-      <tr><td class="id">Q6</td><td class="q">有線LANも対象に含めるか</td><td class="cur">含める</td><td class="ans"><input type="text" placeholder="含める／Wi-Fiのみ"></td></tr>
-      <tr><td class="id">Q7</td><td class="q">同一端末で38系/40系の両方を使うか</td><td class="cur">両方選択可</td><td class="ans"><input type="text" placeholder="両方／38系のみ／40系のみ"></td></tr>
-      <tr><td class="id">Q8</td><td class="q">ホスト番号レンジに変更はあるか<br>（現状：38系=1〜243 / 40系=1〜190）</td><td class="cur">変更なし</td><td class="ans"><input type="text" placeholder="変更なし／________"></td></tr>
+      <tr><th class="id">#</th><th class="q">確認項目</th><th class="ans">回答欄</th></tr>
+      <tr><td class="id">Q1</td><td class="q">サブネットマスク（共通）</td><td class="ans"><input type="text" placeholder="例：255.255.255.0"></td></tr>
+      <tr><td class="id">Q2</td><td class="q">デフォルトゲートウェイ（38系）</td><td class="ans"><input type="text" placeholder="例：10.208.38.___"></td></tr>
+      <tr><td class="id">Q3</td><td class="q">デフォルトゲートウェイ（40系）</td><td class="ans"><input type="text" placeholder="例：10.208.40.___"></td></tr>
+      <tr><td class="id">Q4</td><td class="q">優先DNS（共通）</td><td class="ans"><input type="text" placeholder="例：10.208.__.___"></td></tr>
+      <tr><td class="id">Q5</td><td class="q">代替DNS（あれば）</td><td class="ans"><input type="text" placeholder="なし／________"></td></tr>
+      <tr><td class="id">Q6</td><td class="q">設定画面で 5項目すべて入力可とするか／IPのみ可変で他は既定表示とするか</td><td class="ans"><input type="text" placeholder="5項目すべて／IPのみ可変"></td></tr>
+      <tr><td class="id">Q7</td><td class="q">「社内」は完全にDHCPのみでよいか（固定値の保持不要か）</td><td class="ans"><input type="text" placeholder="DHCPのみでOK／補足"></td></tr>
+      <tr><td class="id">Q8</td><td class="q">配布方法（各PCへ手動コピー／共有フォルダ 等）</td><td class="ans"><input type="text" placeholder="手動コピー／________"></td></tr>
     </table>
-
-    <div class="callout warn">
-      <strong>確定後：</strong>上記 Q1〜Q8 が埋まれば、<code>profiles.json</code> に反映するだけで要件が確定し、運用開始できます。記入後の表を画面ごと共有いただくか、値をそのままお知らせください。
-    </div>
-
     <div class="print-row no-print">
       <button class="btn" onclick="window.print()">この確認シートを印刷 / PDF保存</button>
       <button class="btn ghost" onclick="clearSheet()">記入欄をクリア</button>
     </div>
-    <p class="note no-print">※ 入力内容はこのページ内だけに保持され、サーバーには送信されません（印刷・PDF用）。</p>
+    <p class="note no-print">※ 入力内容はこのページ内だけに保持され、サーバーには送信されません。</p>
   </section>
 
-  <!-- 7 移管の考え方 -->
+  <!-- 7 スケジュール -->
   <section>
-    <h2>7. 「現状の移管」であることの確認</h2>
-    <div class="callout">
-      本ツールは新しい仕組みを導入するものではなく、<strong>今まで人が手で開いていた設定画面と全く同じ項目・同じ値を、Windows標準コマンドで正確に書き込む</strong>ものです。
-    </div>
+    <h2>7. スケジュール</h2>
     <table>
-      <tr><th style="width:34%">確認ポイント</th><th>答え</th></tr>
-      <tr><td>設定される項目</td><td>IP・サブネット・GW・優先/代替DNS。<strong>現状の手入力項目と完全一致</strong></td></tr>
-      <tr><td>設定される値</td><td><code>profiles.json</code> の値。現状の手入力の数字を入れれば<strong>結果は同一</strong></td></tr>
-      <tr><td>Wi-Fi / 有線</td><td>現状同様、対象を選択可能</td></tr>
-      <tr><td>自動取得に戻す</td><td>現状同様に戻せる</td></tr>
+      <tr><th style="width:30%">マイルストーン</th><th>内容</th></tr>
+      <tr><td>要件確定</td><td>本書 ＋ 後日メール（DNS・GW・マスク等の詳細値）の受領で確定</td></tr>
+      <tr><td>実装・テスト</td><td>社内/社外UI・5項目入力フォーム・自動保存を実装し、テスト端末で検証</td></tr>
+      <tr><td>展開</td><td>約20台へ配布（今後の増設も同手順）</td></tr>
+      <tr><td>納期</td><td><strong>2026年7月末予定</strong></td></tr>
     </table>
-    <h3>移管を確信するための検証手順（推奨）</h3>
-    <ol>
-      <li>現状の端末を1台、設定画面で開き、4つの数字をメモ（IP・マスク・GW・DNS）</li>
-      <li>その数字を <code>profiles.json</code> に反映</li>
-      <li>テスト端末1台で「アプリで切替 → 設定画面を開いて、手入力時と同じ数字になっているか目視確認」</li>
-      <li>一致を確認できたら全端末へ展開</li>
-    </ol>
   </section>
 
   <footer>
-    かんたんネット切替ツール 要件定義書 v1.0 ／ 2026-06-22 作成<br>
-    本書の確定には「6. 確認シート」の記入が必要です。
+    IPアドレス切替アプリ 要件定義書 v2.0 ／ 2026-06-22 打合せ反映<br>
+    確定には「6. 確認シート」の項目（特に後日メール共有予定の詳細値）が必要です。
   </footer>
 
 </div>
-
 <script>
-  function clearSheet(){
-    document.querySelectorAll('.sheet input[type=text]').forEach(function(i){ i.value=''; });
-  }
+  function clearSheet(){ document.querySelectorAll('.sheet input[type=text]').forEach(function(i){ i.value=''; }); }
 </script>
 </body>
 </html>
