@@ -117,7 +117,7 @@
   <header class="hero">
     <span class="tag">要件定義書 v2.0</span>
     <h1>IPアドレス切替アプリ</h1>
-    <p>Windows 11 端末の社内（DHCP）／社外（固定IP）をボタン操作で切り替えるツール</p>
+    <p>Windows 11 端末の社内（固定IP）／社外（DHCP）をボタン操作で切り替えるツール</p>
     <div class="meta">
       <span>版数：v2.0（2026-06-22 打合せ反映）</span>
       <span>対象OS：Windows 11 Pro</span>
@@ -141,7 +141,7 @@
   <!-- 1 背景・目的 -->
   <section>
     <h2>1. 背景・目的</h2>
-    <p class="lead">現場端末では、ネットワーク設定を Windows の設定画面から<strong>手入力</strong>で「社内（自動取得）」と「社外（固定IP）」に切り替えている。手順が長く打ち間違いが起きやすいため、<strong>ボタン操作で同一の設定を正確に切り替える</strong>ツールを導入する。</p>
+    <p class="lead">現場端末では、ネットワーク設定を Windows の設定画面から<strong>手入力</strong>で「社内（固定IP）」と「社外（自動取得）」に切り替えている。手順が長く打ち間違いが起きやすいため、<strong>ボタン操作で同一の設定を正確に切り替える</strong>ツールを導入する。</p>
     <div class="callout">設定される項目・値は現状の手入力と同一。<strong>「結果は変えず、手順と事故だけ無くす」</strong>ことがゴール。</div>
     <h3>非ゴール</h3>
     <ul>
@@ -182,12 +182,12 @@
 
     <table>
       <tr><th style="width:24%">選択</th><th>切替内容</th></tr>
-      <tr><td><strong>社内</strong></td><td>DHCP（自動取得）に設定</td></tr>
-      <tr><td><strong>社外</strong></td><td>固定IP（端末ごとに保存した値）に設定</td></tr>
+      <tr><td><strong>社内</strong></td><td>固定IP（端末ごとに保存した値）に設定</td></tr>
+      <tr><td><strong>社外</strong></td><td>DHCP（自動取得）に設定</td></tr>
     </table>
 
     <h3>設定画面（端末ごとの固定IP値を入力）</h3>
-    <p>「社外（固定IP）」で使う値を端末ごとに入力・保存する画面を設ける。</p>
+    <p>「社内（固定IP）」で使う値を端末ごとに入力・保存する画面を設ける。</p>
 <div class="screen">［ 設定（この端末の固定IP）］
    IPアドレス        : [ 10.208.38.___    ]
    サブネットマスク   : [ 255.255.255.0    ]
@@ -204,10 +204,10 @@
     <h2>4. 機能要件</h2>
     <table>
       <tr><th>ID</th><th>機能</th><th>内容</th></tr>
-      <tr><td class="id">FR-1</td><td>社内／社外の選択</td><td>起動画面に「社内」「社外」ボタンを配置。社内=DHCP、社外=固定IP。</td></tr>
+      <tr><td class="id">FR-1</td><td>社内／社外の選択</td><td>起動画面に「社内」「社外」ボタンを配置。社内=固定IP、社外=DHCP。</td></tr>
       <tr><td class="id">FR-2</td><td>アダプタ選択</td><td>「Wi-Fi」「有線LAN」を選択。選択後、自動で設定を切替。</td></tr>
-      <tr><td class="id">FR-3</td><td>社内切替（DHCP）</td><td>IPアドレス・DNS の両方を自動取得（DHCP）に戻す。</td></tr>
-      <tr><td class="id">FR-4</td><td>社外切替（固定IP）</td><td>保存済みの固定IP設定（5項目）を適用する。</td></tr>
+      <tr><td class="id">FR-3</td><td>社内切替（固定IP）</td><td>保存済みの固定IP設定（5項目）を適用する。</td></tr>
+      <tr><td class="id">FR-4</td><td>社外切替（DHCP）</td><td>IPアドレス・DNS の両方を自動取得（DHCP）に戻す。</td></tr>
       <tr><td class="id">FR-5</td><td><strong>端末ごとの設定入力</strong></td>
         <td>設定画面に以下5項目の入力フォームを設置：
           <ul>
@@ -246,7 +246,7 @@
       <tr><td class="id">Q4</td><td class="q">優先DNS（共通）</td><td class="ans"><input type="text" placeholder="例：10.208.__.___"></td></tr>
       <tr><td class="id">Q5</td><td class="q">代替DNS（あれば）</td><td class="ans"><input type="text" placeholder="なし／________"></td></tr>
       <tr><td class="id">Q6</td><td class="q">設定画面で 5項目すべて入力可とするか／IPのみ可変で他は既定表示とするか</td><td class="ans"><input type="text" placeholder="5項目すべて／IPのみ可変"></td></tr>
-      <tr><td class="id">Q7</td><td class="q">「社内」は完全にDHCPのみでよいか（固定値の保持不要か）</td><td class="ans"><input type="text" placeholder="DHCPのみでOK／補足"></td></tr>
+      <tr><td class="id">Q7</td><td class="q">「社外」は完全にDHCPのみでよいか（固定値の保持不要か）</td><td class="ans"><input type="text" placeholder="DHCPのみでOK／補足"></td></tr>
       <tr><td class="id">Q8</td><td class="q">配布方法（各PCへ手動コピー／共有フォルダ 等）</td><td class="ans"><input type="text" placeholder="手動コピー／________"></td></tr>
     </table>
     <div class="print-row no-print">
