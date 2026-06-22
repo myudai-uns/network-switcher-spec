@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>かんたんネット切替ツール｜要件定義書</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --ink:#1f2530; --sub:#5b6270;
+    --line:#e2e5ea; --accent:#ea6a1e; --accent2:#2f8f4e; --warn:#b3261e;
+    --chip:#eef1f5;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:#1f2530;
+    font-family:"Yu Gothic UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    line-height:1.75; font-size:15px;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:32px 20px 80px;}
+  header.hero{
+    background:linear-gradient(135deg,#2a2f3a 0%,#1f2530 100%);
+    color:#fff; border-radius:16px; padding:32px 34px; margin-bottom:28px;
+    box-shadow:0 8px 24px rgba(0,0,0,.12);
+  }
+  header.hero .tag{
+    display:inline-block; background:var(--accent); color:#fff;
+    font-size:12px; font-weight:700; padding:4px 12px; border-radius:999px; letter-spacing:.04em;
+  }
+  header.hero h1{margin:14px 0 6px; font-size:27px; letter-spacing:.01em;}
+  header.hero p{margin:0; color:#c5cad3; font-size:14px;}
+  .meta{margin-top:16px; display:flex; flex-wrap:wrap; gap:8px;}
+  .meta span{background:rgba(255,255,255,.1); padding:4px 12px; border-radius:8px; font-size:12.5px; color:#e6e9ee;}
+
+  section{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:24px 26px; margin-bottom:20px; box-shadow:0 2px 8px rgba(31,37,48,.04);
+  }
+  h2{
+    font-size:19px; margin:0 0 16px; padding-left:13px; position:relative;
+    border-bottom:2px solid var(--line); padding-bottom:10px;
+  }
+  h2::before{
+    content:""; position:absolute; left:0; top:2px; bottom:11px; width:5px;
+    background:var(--accent); border-radius:3px;
+  }
+  h3{font-size:15.5px; margin:20px 0 8px; color:#2a2f3a;}
+  p{margin:6px 0;}
+  .lead{color:#444b57;}
+  ul,ol{margin:6px 0 6px; padding-left:22px;}
+  li{margin:4px 0;}
+
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:14px;}
+  th,td{border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top;}
+  th{background:#f0f2f5; font-weight:700; color:#2a2f3a;}
+  td.id{font-weight:700; color:var(--accent); white-space:nowrap; width:64px;}
+  tr:nth-child(even) td{background:#fafbfc;}
+
+  .callout{
+    border-left:4px solid var(--accent2); background:#f0f8f2;
+    padding:14px 18px; border-radius:8px; margin:14px 0;
+  }
+  .callout.warn{border-left-color:var(--warn); background:#fdf1f0;}
+  .callout strong{color:#1f2530;}
+
+  code,.mono{font-family:"Consolas","SF Mono",monospace; background:var(--chip);
+    padding:1px 7px; border-radius:5px; font-size:13.5px;}
+
+  .screen{
+    background:#1f2530; color:#e6e9ee; border-radius:10px; padding:18px 20px;
+    font-family:"Consolas",monospace; font-size:13px; line-height:1.85; white-space:pre; overflow-x:auto;
+  }
+
+  /* confirmation sheet */
+  .sheet th{background:#fff4ec;}
+  .sheet input[type=text]{
+    width:100%; border:none; border-bottom:1.5px solid #cdd2da; background:transparent;
+    font-size:14px; padding:5px 2px; font-family:inherit; color:#1f2530;
+  }
+  .sheet input[type=text]:focus{outline:none; border-bottom-color:var(--accent);}
+  .sheet td.q{width:30%;}
+  .sheet td.cur{width:24%; color:#6b7280; font-size:13px;}
+  .sheet td.ans{width:46%; background:#fffdfa;}
+  .print-row{margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;}
+  .btn{
+    border:none; background:var(--accent); color:#fff; font-weight:700; font-size:14px;
+    padding:10px 20px; border-radius:9px; cursor:pointer; font-family:inherit;
+  }
+  .btn.ghost{background:#fff; color:#2a2f3a; border:1.5px solid #cdd2da;}
+  .note{font-size:12.5px; color:#6b7280;}
+
+  footer{text-align:center; color:#8a909b; font-size:12px; margin-top:30px;}
+
+  @media print{
+    body{background:#fff;}
+    header.hero{background:#2a2f3a !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .print-row,.no-print{display:none;}
+    section{box-shadow:none; page-break-inside:avoid;}
+  }
+  @media(max-width:560px){
+    .screen{font-size:11px;}
+    th,td{padding:7px 8px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="tag">要件定義書</span>
+    <h1>かんたんネット切替ツール</h1>
+    <p>Windows 端末の IPv4 設定（固定IP ⇔ 自動取得）をボタン操作で切り替えるツール</p>
+    <div class="meta">
+      <span>版数：v1.0（ドラフト）</span>
+      <span>作成日：2026-06-22</span>
+      <span>対象OS：Windows 10 / 11</span>
+      <span>形態：単一exe ＋ 設定ファイル</span>
+    </div>
+  </header>
+
+  <!-- 1 背景・目的 -->
+  <section>
+    <h2>1. 背景・目的</h2>
+    <h3>1.1 背景（現状の課題）</h3>
+    <p class="lead">現場端末では、ネットワーク設定を Windows の「アダプターの設定 → インターネットプロトコル v4 → プロパティ」画面から<strong>手入力</strong>で切り替えている。</p>
+    <ul>
+      <li>IPアドレス／サブネットマスク／デフォルトゲートウェイ／優先・代替DNS の固定値と自動取得（DHCP）を、場面に応じて切り替える必要がある</li>
+      <li>手順が長く（10ステップ以上）、毎回4つの数字を手打ちするため、<strong>打ち間違い・設定漏れの事故</strong>が起きやすい</li>
+      <li>端末ごとに固定IPの末尾が異なるため、作業が属人的になりやすい</li>
+    </ul>
+    <h3>1.2 目的</h3>
+    <p>上記の<strong>手入力作業をボタン操作に置き換える</strong>。設定される項目・値は現状の手入力と完全に同一とし、<strong>「結果は変えず、手順と事故だけ無くす」</strong>ことをゴールとする。</p>
+    <h3>1.3 非ゴール（やらないこと）</h3>
+    <ul>
+      <li>ネットワーク構成・IP体系そのものの変更（現状をそのまま移管するだけ）</li>
+      <li>IPv6設定、プロキシ設定、VPN設定</li>
+      <li>サーバー連携・集中管理（各端末単体で完結）</li>
+    </ul>
+  </section>
+
+  <!-- 2 対象・前提 -->
+  <section>
+    <h2>2. 対象・前提</h2>
+    <table>
+      <tr><th style="width:34%">項目</th><th>内容</th></tr>
+      <tr><td>対象OS</td><td>Windows 10 / 11</td></tr>
+      <tr><td>対象アダプタ</td><td>Wi-Fi（主）／有線LAN（可能なら）の両方。実行時に選択</td></tr>
+      <tr><td>実行権限</td><td>管理者権限（起動時にUAC昇格を自動要求）</td></tr>
+      <tr><td>配布形態</td><td>単一exe（<code>NetworkSwitcher.exe</code>）＋設定ファイル <code>profiles.json</code></td></tr>
+      <tr><td>利用者</td><td>現場端末の操作者（ITに詳しくない人を想定）</td></tr>
+      <tr><td>技術方式</td><td>設定変更は Windows 標準コマンド <code>netsh</code> 経由（手入力と同一結果）</td></tr>
+    </table>
+  </section>
+
+  <!-- 3 機能要件 -->
+  <section>
+    <h2>3. 機能要件</h2>
+    <table>
+      <tr><th>ID</th><th>機能</th><th>内容</th></tr>
+      <tr><td class="id">FR-1</td><td>アダプタ選択</td><td>物理アダプタ（Wi-Fi・有線）を一覧表示。接続中を上位表示。「更新」で再取得。</td></tr>
+      <tr><td class="id">FR-2</td><td>現在設定の表示</td><td>選択中アダプタの 取得方法／IP／マスク／GW／DNS を表示。切替後は自動再取得。</td></tr>
+      <tr><td class="id">FR-3</td><td><strong>固定IP切替<br>（番号入力方式）</strong></td>
+        <td>共通テンプレート <code>10.208.{セグメント}.{ホスト番号}</code> で固定IPを生成。
+          <ul>
+            <li>セグメント選択：<code>10.208.38.x</code> / <code>10.208.40.x</code></li>
+            <li>ホスト番号入力：末尾のみ入力（38系=<strong>1〜243</strong>／40系=<strong>1〜190</strong>）</li>
+            <li>範囲外・数字以外はエラーで適用不可</li>
+            <li>マスク・GW・優先/代替DNS はセグメントごとに自動付与</li>
+            <li>適用前にプレビュー表示</li>
+          </ul></td></tr>
+      <tr><td class="id">FR-4</td><td><strong>端末ごとの<br>設定保持</strong></td>
+        <td>入力したセグメント・番号を端末内（<code>last_input.json</code>）に保存し、次回起動時に自動復元。<strong>端末ごとに一度入力すれば以後は入力不要</strong>。exeは全端末共通、端末差は保存ファイルで吸収。</td></tr>
+      <tr><td class="id">FR-5</td><td>自動取得(DHCP)切替</td><td>IPアドレス・DNS の両方を自動取得（DHCP）に戻す。</td></tr>
+      <tr><td class="id">FR-6</td><td>設定ファイル管理</td><td>セグメント定義・レンジ・マスク・GW・DNS を <code>profiles.json</code> で管理。再読込可。不在時はサンプル自動生成。記述エラーは日本語提示。</td></tr>
+      <tr><td class="id">FR-7</td><td>入力チェック</td><td>適用前に形式・範囲を検証。不正時は中止し原因を日本語表示。</td></tr>
+    </table>
+  </section>
+
+  <!-- 4 非機能要件 -->
+  <section>
+    <h2>4. 非機能要件</h2>
+    <table>
+      <tr><th style="width:22%">区分</th><th>要件</th></tr>
+      <tr><td>操作性</td><td>不慣れな人でも「選ぶ→押す」の2アクションで完了。日本語UI・大きめボタン。</td></tr>
+      <tr><td>正確性</td><td><code>netsh</code> 経由で設定。手入力と同一の結果を保証。</td></tr>
+      <tr><td>安全性</td><td>範囲外IPを物理的に入力不可とし、誤設定を防止。</td></tr>
+      <tr><td>応答性</td><td>取得・適用は別スレッドで実行しUIを固めない。</td></tr>
+      <tr><td>可搬性</td><td>単一exeで動作。Python等のインストール不要。</td></tr>
+      <tr><td>保守性</td><td>IP体系の変更は <code>profiles.json</code> 編集のみで対応（再ビルド不要）。</td></tr>
+      <tr><td>権限</td><td>管理者権限が無い場合は明確に案内。</td></tr>
+    </table>
+  </section>
+
+  <!-- 5 画面構成 -->
+  <section>
+    <h2>5. 画面構成（イメージ）</h2>
+<div class="screen">① 設定するネットワーク（Wi-Fi / 有線）   [ 選択 ▼ ] [ 更新 ]
+
+② 今の設定
+    取得方法 : 手動設定（固定IP）
+    IPアドレス : 10.208.38.15
+    サブネット : 255.255.255.0  ...
+
+③ 切り替え先を選ぶ
+    ○ 現場 固定IP（番号を入力）
+         セグメント   : [ 10.208.38.x ▼ ]
+         ホスト番号   : [   15   ]  （1〜243）
+    ○ 自動取得（DHCP）
+    ── プレビュー ───────────────
+       IPアドレス : 10.208.38.15
+       ゲートウェイ: 10.208.38.254  ...
+
+   [ この設定に切り替える ]   [ 自動取得（DHCP）に戻す ]
+   ▶ 結果メッセージ</div>
+  </section>
+
+  <!-- 6 確認シート -->
+  <section class="sheet">
+    <h2>6. 確認シート（現場で記入してください）</h2>
+    <p class="lead">本ツールを<strong>「現状の手入力運用」と完全に同一</strong>にするため、現状の実値が必要です。<br>
+    現場端末を1台開き、<span class="mono">設定 → ネットワーク → アダプターの設定変更 → Wi-Fiを右クリック → プロパティ → インターネットプロトコル v4 → プロパティ</span> の画面に表示されている値を、下表に記入してください。</p>
+
+    <div class="callout">
+      <strong>記入のコツ：</strong>固定IPが設定されている端末を見れば、マスク・ゲートウェイ・DNSが表示されています。その数字をそのまま転記すればOKです。
+    </div>
+
+    <table>
+      <tr><th class="id">#</th><th class="q">確認項目</th><th class="cur">現状（仮の値）</th><th class="ans">確定値（記入欄）</th></tr>
+      <tr><td class="id">Q1</td><td class="q">サブネットマスク</td><td class="cur">255.255.255.0</td><td class="ans"><input type="text" placeholder="例：255.255.255.0"></td></tr>
+      <tr><td class="id">Q2</td><td class="q">ゲートウェイ（38系）</td><td class="cur">10.208.38.254</td><td class="ans"><input type="text" placeholder="例：10.208.38.254"></td></tr>
+      <tr><td class="id">Q3</td><td class="q">ゲートウェイ（40系）</td><td class="cur">10.208.40.254</td><td class="ans"><input type="text" placeholder="例：10.208.40.254"></td></tr>
+      <tr><td class="id">Q4</td><td class="q">優先DNS（38系 / 40系）</td><td class="cur">GWと同じ</td><td class="ans"><input type="text" placeholder="38系：____ ／ 40系：____"></td></tr>
+      <tr><td class="id">Q5</td><td class="q">代替DNS（あれば）</td><td class="cur">なし</td><td class="ans"><input type="text" placeholder="なし／________"></td></tr>
+      <tr><td class="id">Q6</td><td class="q">有線LANも対象に含めるか</td><td class="cur">含める</td><td class="ans"><input type="text" placeholder="含める／Wi-Fiのみ"></td></tr>
+      <tr><td class="id">Q7</td><td class="q">同一端末で38系/40系の両方を使うか</td><td class="cur">両方選択可</td><td class="ans"><input type="text" placeholder="両方／38系のみ／40系のみ"></td></tr>
+      <tr><td class="id">Q8</td><td class="q">ホスト番号レンジに変更はあるか<br>（現状：38系=1〜243 / 40系=1〜190）</td><td class="cur">変更なし</td><td class="ans"><input type="text" placeholder="変更なし／________"></td></tr>
+    </table>
+
+    <div class="callout warn">
+      <strong>確定後：</strong>上記 Q1〜Q8 が埋まれば、<code>profiles.json</code> に反映するだけで要件が確定し、運用開始できます。記入後の表を画面ごと共有いただくか、値をそのままお知らせください。
+    </div>
+
+    <div class="print-row no-print">
+      <button class="btn" onclick="window.print()">この確認シートを印刷 / PDF保存</button>
+      <button class="btn ghost" onclick="clearSheet()">記入欄をクリア</button>
+    </div>
+    <p class="note no-print">※ 入力内容はこのページ内だけに保持され、サーバーには送信されません（印刷・PDF用）。</p>
+  </section>
+
+  <!-- 7 移管の考え方 -->
+  <section>
+    <h2>7. 「現状の移管」であることの確認</h2>
+    <div class="callout">
+      本ツールは新しい仕組みを導入するものではなく、<strong>今まで人が手で開いていた設定画面と全く同じ項目・同じ値を、Windows標準コマンドで正確に書き込む</strong>ものです。
+    </div>
+    <table>
+      <tr><th style="width:34%">確認ポイント</th><th>答え</th></tr>
+      <tr><td>設定される項目</td><td>IP・サブネット・GW・優先/代替DNS。<strong>現状の手入力項目と完全一致</strong></td></tr>
+      <tr><td>設定される値</td><td><code>profiles.json</code> の値。現状の手入力の数字を入れれば<strong>結果は同一</strong></td></tr>
+      <tr><td>Wi-Fi / 有線</td><td>現状同様、対象を選択可能</td></tr>
+      <tr><td>自動取得に戻す</td><td>現状同様に戻せる</td></tr>
+    </table>
+    <h3>移管を確信するための検証手順（推奨）</h3>
+    <ol>
+      <li>現状の端末を1台、設定画面で開き、4つの数字をメモ（IP・マスク・GW・DNS）</li>
+      <li>その数字を <code>profiles.json</code> に反映</li>
+      <li>テスト端末1台で「アプリで切替 → 設定画面を開いて、手入力時と同じ数字になっているか目視確認」</li>
+      <li>一致を確認できたら全端末へ展開</li>
+    </ol>
+  </section>
+
+  <footer>
+    かんたんネット切替ツール 要件定義書 v1.0 ／ 2026-06-22 作成<br>
+    本書の確定には「6. 確認シート」の記入が必要です。
+  </footer>
+
+</div>
+
+<script>
+  function clearSheet(){
+    document.querySelectorAll('.sheet input[type=text]').forEach(function(i){ i.value=''; });
+  }
+</script>
+</body>
+</html>
